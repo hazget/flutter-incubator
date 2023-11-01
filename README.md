@@ -77,7 +77,7 @@ Do not hesitate to ask your mentor/lead with questions, however you won't receiv
 
 - [x] [0. Become familiar with Dart basics][Step 0] (1 day)
 - [ ] [1. Dart concepts][Step 1] (1 day)
-    - [ ] [1.1. Mixins and extensions][Step 1.1] (1 day)
+    - [x] [1.1. Mixins and extensions][Step 1.1] (1 day)
     - [ ] [1.2. Async and isolates][Step 1.2] (1 day)
     - [ ] [1.3. Generics][Step 1.3] (1 day)
     - [ ] [1.4. Conditional compilation][Step 1.4] (1 day)
