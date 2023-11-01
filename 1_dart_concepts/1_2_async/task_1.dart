@@ -1,21 +1,40 @@
-/// Collection of [messages] allowed to be [read].
+// /// Collection of [messages] allowed to be [read].
+// class Chat {
+//   Chat(this.onRead);
+
+//   /// Callback, called when this [Chat] should be marked as read until the
+//   /// provided [int] remotely.
+//   ///
+//   /// Intended to be a backend mutation.
+//   final void Function(int message) onRead;
+
+//   /// [List] of messages in this [Chat].
+//   final List<int> messages = List.generate(30, (i) => i);
+
+//   /// Marks this [Chat] as read until the specified [message].
+//   void read(int message) {
+//  // TODO: [onRead] should be invoked no more than 1 time in a second.
+
+//     onRead(message);
+//   }
+// }
+
 class Chat {
   Chat(this.onRead);
 
-  /// Callback, called when this [Chat] should be marked as read until the
-  /// provided [int] remotely.
-  ///
-  /// Intended to be a backend mutation.
   final void Function(int message) onRead;
-
-  /// [List] of messages in this [Chat].
   final List<int> messages = List.generate(30, (i) => i);
+  DateTime lastReadTime = DateTime(0);
 
-  /// Marks this [Chat] as read until the specified [message].
   void read(int message) {
-    // TODO: [onRead] should be invoked no more than 1 time in a second.
+    final currentTime = DateTime.now();
+    final timeDifference = currentTime.difference(lastReadTime);
 
-    onRead(message);
+    // Check if at least 1 second has passed since the last read.
+    if (timeDifference.inSeconds >= 1) {
+      onRead(message);
+      lastReadTime = currentTime;
+    }
   }
 }
 
