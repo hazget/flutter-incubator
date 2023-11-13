@@ -1,40 +1,22 @@
-// /// Collection of [messages] allowed to be [read].
-// class Chat {
-//   Chat(this.onRead);
-
-//   /// Callback, called when this [Chat] should be marked as read until the
-//   /// provided [int] remotely.
-//   ///
-//   /// Intended to be a backend mutation.
-//   final void Function(int message) onRead;
-
-//   /// [List] of messages in this [Chat].
-//   final List<int> messages = List.generate(30, (i) => i);
-
-//   /// Marks this [Chat] as read until the specified [message].
-//   void read(int message) {
-//  // TODO: [onRead] should be invoked no more than 1 time in a second.
-
-//     onRead(message);
-//   }
-// }
+import 'dart:async';
 
 class Chat {
   Chat(this.onRead);
 
   final void Function(int message) onRead;
   final List<int> messages = List.generate(30, (i) => i);
-  DateTime lastReadTime = DateTime(0);
 
+  Timer? _debounceTimer;
+
+  // Marks this [Chat] as read until the specified [message].
   void read(int message) {
-    final currentTime = DateTime.now();
-    final timeDifference = currentTime.difference(lastReadTime);
+    // Cancel the existing timer if any
+    _debounceTimer?.cancel();
 
-    // Check if at least 1 second has passed since the last read.
-    if (timeDifference.inSeconds >= 1) {
+    // Create a new timer to debounce the callback
+    _debounceTimer = Timer(Duration(seconds: 1), () {
       onRead(message);
-      lastReadTime = currentTime;
-    }
+    });
   }
 }
 

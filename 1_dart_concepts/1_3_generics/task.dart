@@ -1,35 +1,22 @@
-// void main() {
-//   // Implement a method, returning the maximum element from a `Comparable` list.
-//   // You must use generics to allow different types usage with that method.
-// }
-
-T findMax<T extends Comparable>(List<T> list) {
+T findMaxElement<T extends Comparable<dynamic>>(List<T> list) {
   if (list.isEmpty) {
-    throw ArgumentError('The list cannot be empty.');
+    throw ArgumentError('List cannot be null or empty');
   }
 
-  T max = list[0];
-
-  for (var element in list) {
-    if (element.compareTo(max) > 0) {
-      max = element;
+  T maxElement = list[0];
+  for (int i = 1; i < list.length; i++) {
+    if (list[i].compareTo(maxElement) > 0) {
+      maxElement = list[i];
     }
   }
 
-  return max;
+  return maxElement;
 }
 
 void main() {
-  List<int> intList = [3, 1, 4, 1, 5, 9, 2, 6, 5, 3, 5];
-  int maxInt = findMax(intList);
-  print('Максимальное целое число: $maxInt');
+  List<int> intList = [1, 3, 5, 7, 9, 6, 11, 2];
+  List<String> stringList = ['apple', 'banana', 'cherry', 'null', 'empty'];
 
-  List<double> doubleList = [3.14, 2.71, 1.62, 2.5, 1.0];
-  double maxDouble = findMax(doubleList);
-  print('Максимальное вещественное число: $maxDouble');
-
-  List<String> stringList = ['apple', 'banana', 'cherry', 'date'];
-  String maxString = findMax(stringList);
-  print('Максимальная строка: $maxString');
+  print(findMaxElement(intList)); 
+  print(findMaxElement(stringList)); 
 }
-
