@@ -1,53 +1,86 @@
-/// Item in a chat.
-abstract class ChatItem {}
 
-/// [ChatItem] representing a text message.
-class ChatMessage extends ChatItem {}
+// Define Board entity using the newtype idiom
+class Board {
+  final String id;
+  final String name;
 
-/// [ChatItem] representing a call.
-class ChatCall extends ChatItem {}
+  Board(this.id, this.name);
+}
 
-/// [ChatItem] representing an action happened in a chat.
-class ChatInfo extends ChatItem {}
+// Define Message entity using the newtype idiom
+class Message {
+  final String id;
+  final String boardId;
+  final String content;
+  final String author;
 
-/// [ChatItem] representing a forwarded message.
-class ChatForward extends ChatItem {}
+  Message(this.id, this.boardId, this.content, this.author);
+}
 
-/// Quote of a [ChatItem].
-abstract class ChatItemQuote {
-  const ChatItemQuote({
-    required this.original,
-    required this.at,
-  });
+// Repository interface for Boards
+abstract class BoardsRepository {
+  List<Board> getAllBoards();
+  Board createBoard(String name);
+}
 
-  /// Constructs a [ChatItemQuote] from the provided [item].
-  factory ChatItemQuote.from(ChatItem item) {
-    throw UnimplementedError('Implement me');
+// Repository interface for Messages
+abstract class MessagesRepository {
+  List<Message> getMessagesByBoardId(String boardId);
+  Message postMessage(String boardId, String content, String author);
+}
+
+// In-memory implementation of BoardsRepository
+class InMemoryBoardsRepository implements BoardsRepository {
+  final List<Board> _boards = [];
+
+  @override
+  List<Board> getAllBoards() => List.unmodifiable(_boards);
+
+  @override
+  Board createBoard(String name) {
+    final board = Board(DateTime.now().toIso8601String(), name);
+    _boards.add(board);
+    return board;
   }
-
-  /// Quoted [ChatItem] itself.
-  final ChatItem original;
-
-  /// [DateTime] when this [ChatItemQuote] was created.
-  final DateTime at;
 }
 
-/// [ChatItemQuote] of a [ChatMessage].
-class ChatMessageQuote extends ChatItemQuote {
-  const ChatMessageQuote({required super.original, required super.at});
+// In-memory implementation of MessagesRepository
+class InMemoryMessagesRepository implements MessagesRepository {
+  final List<Message> _messages = [];
+
+  @override
+  List<Message> getMessagesByBoardId(String boardId) =>
+      _messages.where((msg) => msg.boardId == boardId).toList();
+
+  @override
+  Message postMessage(String boardId, String content, String author) {
+    final message =
+        Message(DateTime.now().toIso8601String(), boardId, content, author);
+    _messages.add(message);
+    return message;
+  }
 }
 
-/// [ChatItemQuote] of a [ChatCall].
-class ChatCallQuote extends ChatItemQuote {
-  const ChatCallQuote({required super.original, required super.at});
+// Mock implementation for testing
+class MockMessagesRepository implements MessagesRepository {
+  @override
+  List<Message> getMessagesByBoardId(String boardId) => [];
+
+  @override
+  Message postMessage(String boardId, String content, String author) {
+    throw UnimplementedError('Mock implementation for testing');
+  }
 }
 
-/// [ChatItemQuote] of a [ChatInfo].
-class ChatInfoQuote extends ChatItemQuote {
-  const ChatInfoQuote({required super.original, required super.at});
-}
+void main() {
+  // Example usage
+  final boardsRepository = InMemoryBoardsRepository();
+  final messagesRepository = InMemoryMessagesRepository();
 
-/// [ChatItemQuote] of a [ChatForward].
-class ChatForwardQuote extends ChatItemQuote {
-  const ChatForwardQuote({required super.original, required super.at});
+  final board = boardsRepository.createBoard('Just Chating');
+  print('Created board: ${board.name}');
+
+  final message =
+      messagesRepository.postMessage(board.id, 'Hello, World!', 'Roman Makatsaryia');
+  print('Posted message: ${message.content} by ${message.author}');
 }
