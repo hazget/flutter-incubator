@@ -1,6 +1,5 @@
 import 'dart:convert';
 import 'package:yaml/yaml.dart';
-import 'package:toml/toml.dart';
 import 'dart:io';
 
 class Request {
@@ -33,8 +32,34 @@ class Request {
   }
 
   String toToml() {
-    final tomlMap = toTomlMap();
-    final tomlString = tomlMap.toString();
+    final tomlString = '''
+[type]
+type = "$type"
+
+[stream]
+userId = "${stream.userId}"
+isPrivate = ${stream.isPrivate}
+settings = ${stream.settings}
+shardUrl = "${stream.shardUrl}"
+
+[stream.public_tariff]
+id = ${stream.publicTariff.id}
+price = ${stream.publicTariff.price}
+duration = "${stream.publicTariff.duration}"
+description = "${stream.publicTariff.description}"
+
+[stream.private_tariff]
+clientPrice = ${stream.privateTariff.clientPrice}
+duration = "${stream.privateTariff.duration}"
+description = "${stream.privateTariff.description}"
+
+[gifts]
+${_generateGiftsToml()}
+
+[debug]
+duration = "${debug.duration}"
+at = "${debug.at}"
+''';
     return tomlString;
   }
 
@@ -45,11 +70,15 @@ class Request {
     return YamlMap.wrap(yamlMap);
   }
 
-  TomlDocument toTomlMap() {
-    final jsonMap = toJson();
-    final jsonString = json.encode(jsonMap);
-    final tomlMap = TomlDocument.parse(jsonString);
-    return tomlMap;
+  String _generateGiftsToml() {
+    final buffer = StringBuffer();
+    for (var gift in gifts) {
+      buffer.writeln('[[gifts]]');
+      buffer.writeln('id = ${gift.id}');
+      buffer.writeln('price = ${gift.price}');
+      buffer.writeln('description = "${gift.description}"');
+    }
+    return buffer.toString();
   }
 }
 
@@ -162,19 +191,15 @@ class Debug {
   }
 }
 
-
 void main() {
   final file = File('request.json');
   final jsonString = file.readAsStringSync();
-
   final jsonMap = json.decode(jsonString);
   final request = Request.fromJson(jsonMap);
-
   final yamlString = request.toYaml();
-  // final tomlString = request.toToml();
-
+  final tomlString = request.toToml();
   print('YAML:');
   print(yamlString);
-  // print('TOML:');
-  // print(tomlString);
+  print('TOML:');
+  print(tomlString);
 }
