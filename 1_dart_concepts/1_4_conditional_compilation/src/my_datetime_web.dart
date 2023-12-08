@@ -1,4 +1,5 @@
-import '../my_datetime.dart';
+import 'package:meta/meta.dart';
+
 
 class MyDateTime {
   final DateTime _dateTime;
@@ -6,7 +7,6 @@ class MyDateTime {
   MyDateTime(this._dateTime);
 
   factory MyDateTime.now() {
-    // Implement your custom logic for getting current DateTime on the web platform
     return MyDateTime(DateTime.now());
   }
 
@@ -16,7 +16,6 @@ class MyDateTime {
   }
 
   int get microsecondsSinceEpoch {
-    // Implement your custom logic for getting microseconds since epoch on the web platform
     return _dateTime.millisecondsSinceEpoch * 1000;
   }
 
